@@ -175,11 +175,95 @@ server.tool(
   }
 );
 
+// ─── Tool 3: convert_svg ──────────────────────────────────────────────────────
+server.tool(
+  "convert_svg",
+  "Converts an SVG file to PNG, JPEG, or WebP at the specified dimensions. Supports multiple output sizes in a single call.",
+  {
+    input_svg: z.string().describe(
+      "Absolute path to the source SVG file"
+    ),
+    output_path: z.string().describe(
+      "Absolute path of the output file, including name and extension (e.g. /path/result.png)"
+    ),
+    width: z.number().int().positive().describe(
+      "Output width in pixels"
+    ),
+    height: z.number().int().positive().optional().describe(
+      "Output height in pixels. Omit to scale proportionally from width."
+    ),
+    format: z.enum(["png", "jpeg", "webp"]).optional().default("png").describe(
+      "Output file format (default: png)"
+    ),
+    background_color: z.string().optional().describe(
+      "Background color in hex (e.g. #ffffff). Omit for transparent (only works with png)."
+    ),
+    quality: z.number().int().min(1).max(100).optional().default(95).describe(
+      "Compression quality for jpeg/webp only (1 = lowest, 100 = highest, default: 95)"
+    ),
+  },
+  async ({ input_svg, output_path, width, height, format, background_color, quality }) => {
+    if (!fs.existsSync(input_svg)) {
+      return {
+        isError: true,
+        content: [{ type: "text", text: `SVG file not found: ${input_svg}` }],
+      };
+    }
+
+    if (!input_svg.toLowerCase().endsWith(".svg")) {
+      return {
+        isError: true,
+        content: [{ type: "text", text: `Input file must be an SVG: ${input_svg}` }],
+      };
+    }
+
+    fs.mkdirSync(path.dirname(output_path), { recursive: true });
+
+    try {
+      const hasBg = !!background_color;
+      const bg    = hasBg ? hexToRgb(background_color!) : { r: 0, g: 0, b: 0 };
+
+      let pipeline = sharp(input_svg).resize(
+        width,
+        height ?? null,
+        { fit: height ? "fill" : "outside", withoutEnlargement: false }
+      );
+
+      if (hasBg) {
+        pipeline = pipeline.flatten({ background: bg });
+      }
+
+      if (format === "jpeg")      await pipeline.jpeg({ quality: quality ?? 95 }).toFile(output_path);
+      else if (format === "webp") await pipeline.webp({ quality: quality ?? 95 }).toFile(output_path);
+      else                        await pipeline.png({ compressionLevel: 9 }).toFile(output_path);
+
+      const outMeta = await sharp(output_path).metadata();
+      return {
+        content: [{
+          type: "text",
+          text: JSON.stringify({
+            output:      output_path,
+            width:       outMeta.width,
+            height:      outMeta.height,
+            format,
+            size_bytes:  outMeta.size,
+          }, null, 2),
+        }],
+      };
+    } catch (err) {
+      return {
+        isError: true,
+        content: [{ type: "text", text: `Error: ${err instanceof Error ? err.message : String(err)}` }],
+      };
+    }
+  }
+);
+
 // ─── Start server ─────────────────────────────────────────────────────────────
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("expo-assets-mcp running — tools: generate_expo_icons, transform_image");
+  console.error("expo-assets-mcp running — tools: generate_expo_icons, transform_image, convert_svg");
 }
 
 main().catch((err) => {

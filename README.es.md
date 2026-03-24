@@ -137,6 +137,22 @@ Transforma una imagen a las dimensiones indicadas con proporción de contenido y
 
 ---
 
+### `convert_svg`
+
+Convierte un archivo SVG a PNG, JPEG o WebP en las dimensiones indicadas.
+
+| Parámetro | Tipo | Default | Descripción |
+|---|---|---|---|
+| `input_svg` | string | — | Ruta absoluta al archivo SVG fuente |
+| `output_path` | string | — | Ruta completa del archivo de salida con nombre y extensión |
+| `width` | number | — | Ancho de salida en píxeles |
+| `height` | number | proporcional | Alto de salida en píxeles. Sin valor = escala proporcional al ancho. |
+| `format` | `png\|jpeg\|webp` | `png` | Formato del archivo de salida |
+| `background_color` | string | transparente | Color de fondo en hex. Sin valor = transparente (solo PNG). |
+| `quality` | number | `95` | Calidad de compresión, solo para jpeg/webp (1 = mínima, 100 = máxima) |
+
+---
+
 ## Assets generados
 
 Expo genera todos los tamaños de plataforma automáticamente a partir de estos 10 archivos.
