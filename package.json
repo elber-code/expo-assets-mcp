@@ -1,7 +1,7 @@
 {
   "name": "expo-assets-mcp",
   "version": "1.0.0",
-  "description": "MCP server para generar y transformar assets de Expo",
+  "description": "MCP server for generating and transforming Expo assets",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
