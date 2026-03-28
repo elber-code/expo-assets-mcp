@@ -25,6 +25,12 @@ npm run build
 
 ---
 
+## Web Generator
+
+A pure JavaScript version of this tool is available directly in the browser! Open `index.html` or visit the repository's GitHub Pages URL to generate all Expo assets with a rich UI, including an interactive image cropper to perfectly center your icons, background color selector, and automatic ZIP download. No backend required.
+
+---
+
 ## CLI usage
 
 Generates all Expo assets from a source image. Creates a folder next to the image named `<image>-assets/`.

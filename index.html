@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expo Assets Generator</title>
+  
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-hover: #4338CA;
+      --bg: #0F172A;
+      --panel: #1E293B;
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
+      --border: #334155;
+    }
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #38BDF8, #818CF8);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+    }
+    p {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      text-align: center;
+      max-width: 600px;
+    }
+    .container {
+      background: var(--panel);
+      padding: 2.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      width: 100%;
+      max-width: 800px;
+      border: 1px solid var(--border);
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .help-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    input[type="file"], input[type="color"], input[type="number"], .input-text {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    input[type="file"] { cursor: pointer; }
+    input[type="color"] { height: 3rem; padding: 0.25rem; cursor: pointer; }
+    input[type="range"] {
+      width: 100%;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s;
+      margin-top: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    button.secondary { background: var(--border); }
+    button.secondary:hover { background: #475569; }
+    button:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    button:disabled {
+      background: var(--border);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .cropper-container-wrapper {
+      width: 100%;
+      max-height: 500px;
+      margin: 0 auto;
+      display: none;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      border: 1px dashed var(--border);
+    }
+    .cropper-container-wrapper img {
+      max-width: 100%;
+      display: block;
+    }
+    .slider-container {
+      background: var(--bg);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+      margin-top: 1rem;
+      display: none; /* Se muestra solo en modo centrar */
+    }
+    .log {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #020617;
+      border-radius: 0.5rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #10B981;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+    }
+    .log p { margin: 0.2rem 0; color: #10B981; }
+    .log p.error { color: #EF4444; }
+  </style>
+</head>
+<body>
+
+  <h1>Expo Assets Generator</h1>
+  <p>Genera todos los íconos de Expo desde tu navegador sin backend, empacados en un ZIP listo para descargar.</p>
+
+  <div class="container">
+    <div class="form-group">
+      <label for="imageUpload">1. Selecciona tu imagen base</label>
+      <input type="file" id="imageUpload" accept="image/png, image/jpeg, image/webp, image/svg+xml">
+      <div class="help-text">Se recomienda un PNG con transparencia (1024x1024 mínimo).</div>
+    </div>
+
+    <!-- Controles del cropper -->
+    <div id="cropperControls" style="display: none; justify-content: center; gap: 1rem; margin-top: 1.5rem; margin-bottom: 0.5rem; align-items: center; flex-wrap: wrap;">
+      <label style="display: flex; align-items: center; cursor: pointer; margin: 0; background: var(--bg); padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid var(--border);">
+        <input type="checkbox" id="modeCenter" style="width: auto; margin-right: 0.5rem; transform: scale(1.2);">
+        <span style="font-weight: normal; color: var(--text);">Estricto Centro (Quitar Bordes)</span>
+      </label>
+      <button type="button" id="btnReset" class="secondary" style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.95rem;">Volver al Inicio</button>
+    </div>
+
+    <!-- Control deslizante estricto para tamaño del cuadro al estar en modo centrado -->
+    <div id="sliderWrapper" class="slider-container">
+      <label for="cropSizeSlider" style="margin-bottom: 0.5rem; display: block; text-align: center;">Tamaño exacto del cuadro (10% a 100%)</label>
+      <input type="range" id="cropSizeSlider" min="10" max="100" value="90">
+      <div class="help-text" style="text-align: center;">Usa esta barra para encoger o agrandar el cuadrado desde el centro de forma perfecta.</div>
+    </div>
+
+    <div class="cropper-container-wrapper" id="cropperWrapper">
+      <img id="imagePreview" alt="Vista previa para recortar">
+    </div>
+
+    <div class="form-group" style="margin-top: 1.5rem;">
+      <label for="bgColor">2. Color de fondo (Opcional)</label>
+      <div style="display: flex; gap: 1rem; align-items: center;">
+        <input type="color" id="bgColor" value="#ffffff" style="max-width: 100px;">
+        <div style="display: flex; align-items: center;">
+          <input type="checkbox" id="useBg" style="width: auto; margin-right: 0.5rem; transform: scale(1.2);">
+          <label for="useBg" style="margin: 0; font-weight: normal; cursor: pointer;">Usar color de fondo selectivo</label>
+        </div>
+      </div>
+      <div class="help-text">Si se activa, los íconos sin transparencia en el estándar de expo usarán este color. En caso contrario, su fondo será blanco por defecto.</div>
+    </div>
+
+    <div class="form-group" style="margin-top: 2rem;">
+      <label>3. Proporciones de Relleno (0.1 a 1.0)</label>
+      <div class="grid">
+        <div><label>Icon</label><input type="number" id="propIcon" step="0.01" min="0.1" max="1" value="0.7"></div>
+        <div><label>Android Adaptive</label><input type="number" id="propAndroid" step="0.01" min="0.1" max="1" value="0.33"></div>
+        <div><label>Android Monochrome</label><input type="number" id="propMono" step="0.01" min="0.1" max="1" value="0.33"></div>
+        <div><label>Splash</label><input type="number" id="propSplash" step="0.01" min="0.1" max="1" value="0.5"></div>
+        <div><label>Favicon</label><input type="number" id="propFavicon" step="0.01" min="0.1" max="1" value="0.8"></div>
+        <div><label>React Logo</label><input type="number" id="propReact" step="0.01" min="0.1" max="1" value="0.8"></div>
+        <div><label>Partial Logo</label><input type="number" id="propPartial" step="0.01" min="0.1" max="1" value="0.5"></div>
+      </div>
+    </div>
+
+    <button id="generateBtn" disabled>Generar y Descargar ZIP</button>
+
+    <div id="logArea" class="log"></div>
+  </div>
+
+  <script>
+    const imageUpload = document.getElementById('imageUpload');
+    const imagePreview = document.getElementById('imagePreview');
+    const cropperWrapper = document.getElementById('cropperWrapper');
+    const cropperControls = document.getElementById('cropperControls');
+    const sliderWrapper = document.getElementById('sliderWrapper');
+    const cropSizeSlider = document.getElementById('cropSizeSlider');
+    const generateBtn = document.getElementById('generateBtn');
+    const logArea = document.getElementById('logArea');
+    const useBgCb = document.getElementById('useBg');
+    const bgColorInp = document.getElementById('bgColor');
+    
+    const modeCenterCb = document.getElementById('modeCenter');
+    const btnReset = document.getElementById('btnReset');
+
+    let cropper = null;
+    let sourceImage = null;
+
+    function initCropper() {
+      if (cropper) cropper.destroy();
+      
+      const isCenterMode = modeCenterCb.checked;
+      
+      // Si está en modo central, mostramos el control deslizante y bloqueamos ratón
+      sliderWrapper.style.display = isCenterMode ? 'block' : 'none';
+
+      cropper = new Cropper(imagePreview, {
+        aspectRatio: 1, 
+        viewMode: 1,    
+        autoCropArea: isCenterMode ? (cropSizeSlider.value / 100) : 0.9,
+        background: false,
+        dragMode: isCenterMode ? 'none' : 'crop', // 'none' desactiva mover la imagen
+        cropBoxMovable: !isCenterMode,            // desactiva mover la caja con el ratón
+        cropBoxResizable: !isCenterMode,          // desactiva estirar con el ratón
+        zoomable: !isCenterMode,                  // desactiva hacer zoom con la rueda
+        ready() {
+          if (isCenterMode) {
+            updateCropBoxSize();
+          }
+        }
+      });
+    }
+
+    // Al arrastrar la barra, cambia el tamaño del cuadro pero lo mantiene en el centro absoluto
+    function updateCropBoxSize() {
+      if (!cropper) return;
+      const ratio = parseInt(cropSizeSlider.value) / 100;
+
+      // Obtener las dimensiones del contenedor de la imagen visible
+      const canvasData = cropper.getCanvasData();
+      
+      // El tamaño máximo cuadrado que cabe
+      const maxSquareSize = Math.min(canvasData.width, canvasData.height);
+      const newSize = maxSquareSize * ratio;
+
+      cropper.setCropBoxData({
+        width: newSize,
+        height: newSize,
+        left: canvasData.left + (canvasData.width - newSize) / 2,
+        top: canvasData.top + (canvasData.height - newSize) / 2
+      });
+    }
+
+    cropSizeSlider.addEventListener('input', () => {
+      if (modeCenterCb.checked) {
+        updateCropBoxSize();
+      }
+    });
+
+    modeCenterCb.addEventListener('change', () => {
+       if (imagePreview.src) {
+           initCropper();
+       }
+    });
+
+    btnReset.addEventListener('click', () => {
+       if (cropper) {
+           cropper.reset();
+           if (modeCenterCb.checked) {
+              cropSizeSlider.value = 90;
+              updateCropBoxSize();
+           }
+       }
+    });
+
+    imageUpload.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) {
+        if (cropper) { cropper.destroy(); cropper = null; }
+        cropperWrapper.style.display = 'none';
+        cropperControls.style.display = 'none';
+        sliderWrapper.style.display = 'none';
+        generateBtn.disabled = true;
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        imagePreview.src = event.target.result;
+        cropperWrapper.style.display = 'block';
+        cropperControls.style.display = 'flex';
+        
+        modeCenterCb.checked = true; // Forzamos por defecto este nuevo sistema si el usuario se liaba
+        
+        initCropper();
+        generateBtn.disabled = false;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function logMessage(msg, isError = false) {
+      logArea.style.display = 'block';
+      const p = document.createElement('p');
+      p.textContent = msg;
+      if (isError) p.className = 'error';
+      logArea.appendChild(p);
+      logArea.scrollTop = logArea.scrollHeight;
+    }
+
+    const EXPO_ASSETS = [
+      { filename: "icon.png", canvasW: 1024, canvasH: 1024, keepAlpha: false, propKey: "propIcon" },
+      { filename: "android-icon-foreground.png", canvasW: 512, canvasH: 512, keepAlpha: true, propKey: "propAndroid" },
+      { filename: "android-icon-background.png", canvasW: 512, canvasH: 512, keepAlpha: false, propKey: "propAndroid" },
+      { filename: "android-icon-monochrome.png", canvasW: 432, canvasH: 432, keepAlpha: true, monochrome: true, propKey: "propMono" },
+      { filename: "splash-icon.png", canvasW: 1024, canvasH: 1024, keepAlpha: true, propKey: "propSplash" },
+      { filename: "favicon.png", canvasW: 48, canvasH: 48, keepAlpha: true, propKey: "propFavicon" },
+      { filename: "react-logo.png", canvasW: 100, canvasH: 100, keepAlpha: true, propKey: "propReact" },
+      { filename: "react-logo@2x.png", canvasW: 200, canvasH: 200, keepAlpha: true, propKey: "propReact" },
+      { filename: "react-logo@3x.png", canvasW: 300, canvasH: 300, keepAlpha: true, propKey: "propReact" },
+      { filename: "partial-react-logo.png", canvasW: 518, canvasH: 316, keepAlpha: true, partial: true, propKey: "propPartial" },
+    ];
+
+    async function processAsset(asset) {
+      return new Promise((resolve, reject) => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = asset.canvasW;
+          canvas.height = asset.canvasH;
+          const ctx = canvas.getContext('2d');
+
+          const propValue = parseFloat(document.getElementById(asset.propKey).value);
+          const prop = isNaN(propValue) ? 1.0 : propValue;
+          
+          const applyBg = useBgCb.checked && (!asset.keepAlpha);
+
+          if (applyBg) {
+            ctx.fillStyle = bgColorInp.value;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          } else if (!asset.keepAlpha) {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          }
+
+          if (asset.partial) {
+            const srcW = sourceImage.width;
+            const srcH = sourceImage.height;
+            const cropW = Math.round(srcW * prop);
+            const cropH = Math.round(srcH * prop);
+            const cropLeft = srcW - cropW; 
+            const cropTop = 0;             
+
+            const scale = Math.min(canvas.width / cropW, canvas.height / cropH);
+            const drawW = cropW * scale;
+            const drawH = cropH * scale;
+            const drawLeft = (canvas.width - drawW) / 2;
+            const drawTop = (canvas.height - drawH) / 2;
+
+            ctx.drawImage(sourceImage, cropLeft, cropTop, cropW, cropH, drawLeft, drawTop, drawW, drawH);
+          } else {
+            const contentW = canvas.width * prop;
+            const contentH = canvas.height * prop;
+
+            const scale = Math.min(contentW / sourceImage.width, contentH / sourceImage.height);
+            const drawW = sourceImage.width * scale;
+            const drawH = sourceImage.height * scale;
+            
+            const drawLeft = (canvas.width - drawW) / 2;
+            const drawTop = (canvas.height - drawH) / 2;
+
+            ctx.drawImage(sourceImage, drawLeft, drawTop, drawW, drawH);
+          }
+
+          if (asset.monochrome) {
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+            for (let i = 0; i < data.length; i += 4) {
+              if (data[i + 3] > 10) { 
+                data[i] = 255;
+                data[i + 1] = 255;
+                data[i + 2] = 255;
+              }
+            }
+            ctx.putImageData(imgData, 0, 0);
+          }
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve({ filename: asset.filename, blob });
+            } else {
+              reject(new Error("Failed to create blob"));
+            }
+          }, 'image/png');
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }
+
+    generateBtn.addEventListener('click', async () => {
+      if (!cropper) return;
+
+      logArea.innerHTML = '';
+      logArea.style.display = 'block';
+      logMessage('Preparando recorte de imagen (1:1)...');
+      generateBtn.disabled = true;
+
+      const croppedCanvas = cropper.getCroppedCanvas({
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high',
+      });
+
+      if (!croppedCanvas) {
+        logMessage('Error al recortar la imagen.', true);
+        generateBtn.disabled = false;
+        return;
+      }
+
+      sourceImage = new Image();
+      sourceImage.src = croppedCanvas.toDataURL('image/png');
+
+      await new Promise(resolve => {
+        sourceImage.onload = resolve;
+      });
+
+      logMessage('Iniciando generación de assets...');
+
+      const zip = new JSZip();
+      
+      try {
+        for (const asset of EXPO_ASSETS) {
+          logMessage(`Generando ${asset.filename}...`);
+          const result = await processAsset(asset);
+          zip.file(result.filename, result.blob);
+        }
+
+        logMessage('Comprimiendo todos los archivos en un ZIP...');
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        
+        logMessage('¡Completado! Descarga iniciando...');
+        
+        const url = URL.createObjectURL(zipBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'expo-assets.zip';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        logMessage(`Ocurrió un error: ${e.message}`, true);
+        console.error(e);
+      } finally {
+        generateBtn.disabled = false;
+      }
+    });
+
+  </script>
+</body>
+</html>

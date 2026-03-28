@@ -25,6 +25,12 @@ npm run build
 
 ---
 
+## Generador Web
+
+¡Una nueva versión en JavaScript puro está disponible directamente en tu navegador! Abre `index.html` o visita la URL de GitHub Pages del repositorio para generar todos tus assets de Expo con una interfaz gráfica sencilla. Cuenta con un recortador de imágenes súper útil para encuadrar y centrar perfectamente tus íconos, selector de color de fondo y descarga en ZIP sin necesidad de backend.
+
+---
+
 ## Uso como CLI
 
 Genera todos los assets de Expo a partir de una imagen fuente. Crea una carpeta junto a la imagen con el nombre `<imagen>-assets/`.
