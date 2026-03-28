@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -199,7 +199,6 @@
       align-items: center;
       text-align: center;
     }
-    /* Añadimos un fondo punteado sutil (transparencia visible) */
     .preview-card canvas {
       max-width: 120px;
       height: auto;
@@ -249,33 +248,34 @@
 <body>
 
   <div class="lang-switch">
-    <a href="index.html" class="active">EN</a>
+    <a href="index.html">EN</a>
     <span style="color: var(--text-muted);">|</span>
-    <a href="index_es.html">ES</a>
+    <a href="index_es.html" class="active">ES</a>
   </div>
 
   <h1>Expo Assets Generator</h1>
-  <p>Generate all Expo icons and custom Banners directly in your browser, packed in a ZIP ready to download.</p>
+  <p>Genera todos los íconos de Expo y Banners personalizados desde tu navegador, empacados en un ZIP listo para descargar.</p>
 
   <div class="container">
     <div class="form-group">
-      <label for="imageUpload">1. Select your base image</label>
+      <label for="imageUpload">1. Selecciona tu imagen base</label>
       <input type="file" id="imageUpload" accept="image/png, image/jpeg, image/webp, image/svg+xml">
-      <div class="help-text">A PNG with transparency is recommended (minimum 1024x1024).</div>
+      <div class="help-text">Se recomienda un PNG con transparencia (mínimo 1024x1024).</div>
     </div>
 
+    <!-- Cropper Controls -->
     <div id="cropperControls" style="display: none; justify-content: center; gap: 1rem; margin-top: 1.5rem; margin-bottom: 0.5rem; align-items: center; flex-wrap: wrap;">
       <label style="display: flex; align-items: center; cursor: pointer; margin: 0; background: var(--bg); padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid var(--border);">
         <input type="checkbox" id="modeCenter" style="width: auto; margin-right: 0.5rem; transform: scale(1.2);" checked>
-        <span style="font-weight: normal; color: var(--text);">Strict Center (Remove Borders)</span>
+        <span style="font-weight: normal; color: var(--text);">Estricto Centro (Quitar Bordes)</span>
       </label>
-      <button type="button" id="btnReset" class="secondary" style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.95rem;">Reset View</button>
+      <button type="button" id="btnReset" class="secondary" style="width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.95rem;">Restablecer Vista</button>
     </div>
 
     <div id="sliderWrapper" class="slider-container">
-      <label for="cropSizeSlider" style="margin-bottom: 0.5rem; display: block; text-align: center;">Image crop size (10% to 100%)</label>
+      <label for="cropSizeSlider" style="margin-bottom: 0.5rem; display: block; text-align: center;">Tamaño del corte de la imagen (10% a 100%)</label>
       <input type="range" id="cropSizeSlider" min="10" max="100" value="100">
-      <div class="help-text" style="text-align: center;">100% takes the entire square area without cropping anything extra from the image (default).</div>
+      <div class="help-text" style="text-align: center;">El 100% toma toda el área cuadrada sin recortar nada extra de la imagen (por defecto).</div>
     </div>
 
     <div class="cropper-container-wrapper" id="cropperWrapper">
@@ -283,36 +283,36 @@
     </div>
 
     <div class="form-group" style="margin-top: 1.5rem;">
-      <label for="bgColor">2. Background color (Optional)</label>
+      <label for="bgColor">2. Color de fondo (Opcional)</label>
       <div style="display: flex; gap: 1rem; align-items: center;">
         <input type="color" id="bgColor" value="#ffffff" style="max-width: 100px;">
         <div style="display: flex; align-items: center;">
           <input type="checkbox" id="useBg" style="width: auto; margin-right: 0.5rem; transform: scale(1.2);">
-          <label for="useBg" style="margin: 0; font-weight: normal; cursor: pointer;">Use selective background color for Expo assets</label>
+          <label for="useBg" style="margin: 0; font-weight: normal; cursor: pointer;">Usar color de fondo selectivo en expo assets</label>
         </div>
       </div>
-      <div class="help-text">If enabled, ZIP icons without transparency as per expo standards will use this color.</div>
+      <div class="help-text">Si se activa, los íconos del ZIP sin transparencia en el estándar de expo usarán este color.</div>
     </div>
 
     <div class="form-group" style="margin-top: 2rem;">
-      <label>3. Fill Proportions for the ZIP (0.1 to 1.0)</label>
+      <label>3. Proporciones de Relleno para el ZIP (0.1 a 1.0)</label>
       <div class="grid" id="proportionsGrid">
         <!-- Rendered by JS -->
       </div>
-      <button type="button" id="btnAddCustomZipAsset" class="secondary" style="max-width: 300px;">➕ Add another asset to the ZIP</button>
+      <button type="button" id="btnAddCustomZipAsset" class="secondary" style="max-width: 300px;">➕ Añadir otro asset al ZIP</button>
     </div>
 
-    <button id="generateBtn" disabled>Generate and Download Complete ZIP</button>
+    <button id="generateBtn" disabled>Generar y Descargar ZIP Completo</button>
 
     <div id="logArea" class="log"></div>
 
     <!-- PREVIEWS SECTION -->
     <div id="previewsSection" style="display: none;">
       <h2>Icon Preview</h2>
-      <p style="margin: 0 auto 1rem;">See how your final design looks with different backgrounds and shapes (iOS squircle, Android circle). Live previews and downloads at 512x512px.</p>
+      <p style="margin: 0 auto 1rem;">Mira cómo luce tu diseño final con distintos fondos y formas (iOS squircle, Android circle). Previsualizaciones y descargas en vivo de 512x512px.</p>
       
       <div style="text-align: center; margin-bottom: 2rem;">
-        <label for="iconPreviewProp" style="display: inline-block; margin-right: 0.5rem; font-weight: 600;">Icon proportion (0.1 - 1.0):</label>
+        <label for="iconPreviewProp" style="display: inline-block; margin-right: 0.5rem; font-weight: 600;">Proporción del ícono (0.1 - 1.0):</label>
         <input type="number" id="iconPreviewProp" step="0.01" min="0.1" max="1" value="0.7" style="width: 100px; display: inline-block;">
       </div>
 
@@ -320,8 +320,8 @@
         <!-- Rendered by JS -->
       </div>
 
-      <h2>App Store & Mobile Previews (Banners)</h2>
-      <p style="margin: 0 auto 2rem;">Preview how a specific asset (e.g., Splash or Icon) would look inside a promo banner or simulated mobile screen.</p>
+      <h2>Preview de Cartel o Móvil (Banners)</h2>
+      <p style="margin: 0 auto 2rem;">Previsualiza cómo se vería un asset específico (ej. Splash o Icono) dentro de un cartel, banner promocional o pantalla de móvil simulada.</p>
       
       <div class="banner-grid" id="bannerGrid" style="margin-bottom: 2rem;">
         <!-- Rendered by JS -->
@@ -329,15 +329,15 @@
 
       <div class="form-row" style="background: var(--bg); padding: 1rem; border-radius: 1rem; border: 1px solid var(--border); margin-bottom: 2rem;">
         <div>
-          <label>Width</label>
+          <label>Ancho</label>
           <input type="number" id="newBanW" value="1080">
         </div>
         <div>
-          <label>Height</label>
+          <label>Alto</label>
           <input type="number" id="newBanH" value="1920">
         </div>
         <div>
-          <label>Asset Type</label>
+          <label>Tipo de Asset</label>
           <select id="newBanAsset">
             <option value="Icon">Icon</option>
             <option value="Android Adaptive">Android Adaptive</option>
@@ -349,20 +349,20 @@
           </select>
         </div>
         <div>
-          <label>Render Size (px)</label>
+          <label>Tamaño Render (px)</label>
           <input type="number" id="newBanIcon" value="300">
         </div>
         <div>
-          <label>Banner Background</label>
+          <label>Fondo de Cartel</label>
           <select id="newBanBg">
-            <option value="#ffffff">White</option>
-            <option value="#000000">Black</option>
-            <option value="#1F2937">Dark Gray</option>
-            <option value="transparent">Transparent</option>
+            <option value="#ffffff">Blanco</option>
+            <option value="#000000">Negro</option>
+            <option value="#1F2937">Gris Oscuro</option>
+            <option value="transparent">Transparente</option>
           </select>
         </div>
         <div style="flex: 0 0 auto;">
-          <button id="addBannerBtn" class="secondary" style="margin:0; height: 100%;">Add Banner</button>
+          <button id="addBannerBtn" class="secondary" style="margin:0; height: 100%;">Añadir Banner</button>
         </div>
       </div>
     </div>
@@ -415,10 +415,10 @@
     }
     
     document.getElementById('btnAddCustomZipAsset').addEventListener('click', () => {
-      const name = prompt("File name (e.g. banner.png):");
+      const name = prompt("Nombre del archivo (ej. banner.png):");
       if (!name) return;
-      const size = parseInt(prompt("Size in pixels (square, e.g., 512 for 512x512):", "512")) || 512;
-      const prop = parseFloat(prompt("Fill proportion (0.1 to 1.0):", "1.0")) || 1.0;
+      const size = parseInt(prompt("Tamaño en píxeles (cuadrado, ej. 512 para 512x512):", "512")) || 512;
+      const prop = parseFloat(prompt("Proporción de relleno (0.1 al 1.0):", "1.0")) || 1.0;
       
       const newId = "customProp" + Date.now();
       EXPO_ASSETS.push({
@@ -442,7 +442,7 @@
       { id: 'prev-round-dark', title: 'Squircle Dark', shape: 'rounded', bg: '#000000', size: 512 },
       { id: 'prev-circle-light', title: 'Round Light', shape: 'circle', bg: '#ffffff', size: 512 },
       { id: 'prev-circle-dark', title: 'Round Dark', shape: 'circle', bg: '#000000', size: 512 },
-      { id: 'prev-square-trans', title: 'Square Transp.', shape: 'square', bg: 'transparent', size: 512 },
+      { id: 'prev-square-trans', title: 'Cuadrado Transp.', shape: 'square', bg: 'transparent', size: 512 },
     ];
 
     let bannerPreviewsConf = [
@@ -600,7 +600,7 @@
            title.textContent = conf.title;
            const btn = document.createElement('button');
            btn.className = 'secondary small';
-           btn.textContent = '⬇️ Download';
+           btn.textContent = '⬇️ Descargar';
            btn.onclick = () => downloadCanvas(canvas, `preview_${conf.shape}_${conf.bg.replace('#','')}.png`);
 
            card.appendChild(canvas);
@@ -623,7 +623,7 @@
            const btn = document.createElement('button');
            btn.className = 'secondary small';
            btn.style.width = '100px';
-           btn.textContent = '⬇️ Download';
+           btn.textContent = '⬇️ Descargar';
            btn.onclick = () => downloadCanvas(canvas, `banner_${conf.assetLabel.replace(' ','_')}_${conf.w}x${conf.h}_${idx}.png`);
 
            const row = document.createElement('div');
@@ -847,7 +847,7 @@
 
       logArea.innerHTML = '';
       logArea.style.display = 'block';
-      logMessage('Preparing images...');
+      logMessage('Preparando imágenes...');
       generateBtn.disabled = true;
 
       const croppedCanvas = cropper.getCroppedCanvas({
@@ -856,7 +856,7 @@
       });
 
       if (!croppedCanvas) {
-        logMessage('Error retrieving image.', true);
+        logMessage('Error al obtener imagen.', true);
         generateBtn.disabled = false;
         return;
       }
@@ -868,20 +868,20 @@
         imgRootSquare.onload = resolve;
       });
 
-      logMessage('Starting packed generation...');
+      logMessage('Iniciando generación empaquetada...');
       const zip = new JSZip();
       
       try {
         for (const asset of EXPO_ASSETS) {
-          logMessage(`Generating ${asset.filename}...`);
+          logMessage(`Generando ${asset.filename}...`);
           const result = await processAssetForZip(asset, imgRootSquare);
           zip.file(result.filename, result.blob);
         }
 
-        logMessage('Compressing ZIP...');
+        logMessage('Comprimiendo ZIP...');
         const zipBlob = await zip.generateAsync({ type: 'blob' });
         
-        logMessage('Completed! Downloading ZIP...');
+        logMessage('¡Completado! Descargando ZIP...');
         
         const url = URL.createObjectURL(zipBlob);
         const a = document.createElement('a');
@@ -892,7 +892,7 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
       } catch (e) {
-        logMessage(`Error during ZIP: ${e.message}`, true);
+        logMessage(`Error durante ZIP: ${e.message}`, true);
         console.error(e);
       } finally {
         generateBtn.disabled = false;

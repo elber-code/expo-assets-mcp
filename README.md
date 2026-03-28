@@ -27,7 +27,14 @@ npm run build
 
 ## Web Generator
 
-A pure JavaScript version of this tool is available directly in the browser! Open `index.html` or visit the repository's GitHub Pages URL to generate all Expo assets with a rich UI, including an interactive image cropper to perfectly center your icons, background color selector, and automatic ZIP download. No backend required.
+A pure JavaScript version of this tool is available directly in the browser! Open `index.html` or visit [https://elber-code.github.io/expo-assets-mcp/](https://elber-code.github.io/expo-assets-mcp/) to access a rich GUI that features:
+- **Interactive Cropper**: Perfectly center your icons with a 1:1 aspect ratio.
+- **Live Icon Previews**: See how your icon looks in iOS (squircle) and Android (circle) shapes with transparent or solid backgrounds in real-time.
+- **Advanced Banners**: Generate App Store mockups or promo banners by placing your Expo assets (e.g. Splash, Icon) inside custom resolutions to download individually.
+- **Custom ZIP Assets**: Easily add extra custom-sized assets to the final ZIP.
+- **Bilingual Interface**: Seamlessly switch between English and Spanish (`index_es.html`).
+
+No backend or server required; everything is processed locally in your browser!
 
 ---
 
